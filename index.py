@@ -8,25 +8,30 @@ CORS(app)
 interfaces = []
 filePath = []
 
+
 @app.route('/interfaces', methods=['POST'])
 def getInterfaces():
     global interfaces
     interfaces = request.json["interfaces"]
     return interfaces
 
+
 @app.route('/filePath', methods=['POST'])
 def getFilePath():
     filePath = request.json["filePath"]
     print(filePath)
     print('Absolute path of file:     ',
-      os.path.abspath(filePath))
-    return filePath
-    
+          os.path.abspath(filePath))
+    absFilePath = os.path.abspath(filePath)
+    return absFilePath
+
+
 def getInput():
-    if(len(interfaces) > 0):
+    if (len(interfaces) > 0):
         return "YES"
     else:
         return "NO"
+
 
 @app.route('/checkStatus', methods=['GET'])
 def checkStatus():
