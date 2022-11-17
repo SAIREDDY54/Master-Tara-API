@@ -6,6 +6,7 @@ app = Flask(__name__)
 CORS(app)
 
 interfaces = []
+fileName = []
 filePath = []
 
 @app.route('/interfaces', methods=['POST'])
@@ -16,10 +17,10 @@ def getInterfaces():
 
 @app.route('/filePath', methods=['POST'])
 def getFilePath():
-    filePath = request.json["filePath"]
-    print(filePath)
-    print('Absolute path of file:     ',
-      os.path.abspath(filePath))
+    global filePath
+    fileName = request.json["filePath"]
+    print(fileName)
+    filePath = os.path.abspath(fileName)
     return filePath
     
 def getInput():
@@ -31,6 +32,7 @@ def getInput():
 @app.route('/checkStatus', methods=['GET'])
 def checkStatus():
     if getInput() == "YES":
+        print(filePath)
         return "SUCCESS"
     else:
         return "FAILED"
