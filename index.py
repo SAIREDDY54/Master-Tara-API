@@ -10,7 +10,7 @@ from subprocess import Popen
 app = Flask(__name__)
 CORS(app)
 
-app.config['CORS_HEADERS'] = 'Content-Type'
+app.config['CORS_HEADERS'] = 'Content-Type', 'access-control-allow-origin'
 
 interfaces = []
 filePath = []
@@ -23,7 +23,7 @@ def runAnotherFile():
 
 
 @app.route('/interfaces', methods=['POST'])
-@cross_origin(origin='*',headers=['Content-Type'])
+@cross_origin(origin='*',headers=['access-control-allow-origin','Content-Type'])
 def getInterfaces():
     global interfaces
     interfaces = request.json["interfaces"]
@@ -53,7 +53,7 @@ def getInterfaces():
 
 
 @app.route('/filePath', methods=['POST'])
-@cross_origin(origin='*',headers=['Content-Type'])
+@cross_origin(origin='*',headers=['access-control-allow-origin','Content-Type'])
 def getFilePath():
     global filePath
     global abs
@@ -75,7 +75,7 @@ def getInput():
 
 
 @app.route('/checkStatus', methods=['GET'])
-@cross_origin(origin='*',headers=['Content-Type'])
+@cross_origin(origin='*',headers=['access-control-allow-origin','Content-Type'])
 def checkStatus():
     # main()
     if getInput() == "YES":
