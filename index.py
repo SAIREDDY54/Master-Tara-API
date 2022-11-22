@@ -5,7 +5,11 @@ import win32file
 import time
 import os
 import pyodbc
+from subprocess import Popen
 
+
+app = Flask(__name__)
+CORS(app)
 
 conn = pyodbc.connect(
     r'Driver={Microsoft Access Driver (*.mdb, *.accdb)};DBQ=C:\Users\DUMA1KOR\Downloads\Database3.accdb;')
@@ -26,8 +30,6 @@ def fetch_data_from_db():
     return db_list
 
 
-app = Flask(__name__)
-CORS(app)
 
 interfaces = []
 filePath = []
@@ -36,11 +38,16 @@ absPath = []
 abs = []
 
 
+def runAnotherFile():
+    Popen('python db_access.py')
+
+
 @app.route('/interfaces', methods=['POST'])
 def getInterfaces():
     global interfaces
     interfaces = request.json["interfaces"]
     print("pipe interfaces")
+    runAnotherFile()
     pipe = win32pipe.CreateNamedPipe(
         r'\\.\pipe\Foo',
         win32pipe.PIPE_ACCESS_DUPLEX,
