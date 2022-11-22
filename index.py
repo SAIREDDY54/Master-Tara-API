@@ -75,7 +75,7 @@ def getInput():
 
 
 @app.route('/checkStatus', methods=['GET'])
-# @cross_origin(origin='*',headers=['Content-Type'])
+@cross_origin(origin='*',headers=['Content-Type'])
 def checkStatus():
     # main()
     if getInput() == "YES":
