@@ -1,5 +1,5 @@
 from flask import Flask, request
-from flask_cors import CORS
+from flask_cors import CORS, cross_origin
 import win32pipe
 import win32file
 import time
@@ -9,6 +9,8 @@ from subprocess import Popen
 
 app = Flask(__name__)
 CORS(app)
+
+app.config['CORS_HEADERS'] = 'Content-Type'
 
 interfaces = []
 filePath = []
@@ -21,6 +23,7 @@ def runAnotherFile():
 
 
 @app.route('/interfaces', methods=['POST'])
+@cross_origin(origin='*',headers=['Content-Type'])
 def getInterfaces():
     global interfaces
     interfaces = request.json["interfaces"]
@@ -50,6 +53,7 @@ def getInterfaces():
 
 
 @app.route('/filePath', methods=['POST'])
+@cross_origin(origin='*',headers=['Content-Type'])
 def getFilePath():
     global filePath
     global abs
@@ -59,7 +63,7 @@ def getFilePath():
 
 
 def sendFilePath():
-    
+
     return abs
 
 
@@ -71,13 +75,13 @@ def getInput():
 
 
 @app.route('/checkStatus', methods=['GET'])
+# @cross_origin(origin='*',headers=['Content-Type'])
 def checkStatus():
     # main()
     if getInput() == "YES":
         return "SUCCESS"
     else:
         return "FAILED"
-
 
 
 if __name__ == '__main__':
