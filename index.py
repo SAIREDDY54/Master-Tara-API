@@ -21,6 +21,9 @@ abs = []
 def runAnotherFile():
     Popen('python db_access.py')
 
+@app.route('/hello', methods=['GET'])
+def home():
+    return "Hello World"
 
 @app.route('/interfaces', methods=['POST'])
 # @cross_origin(origin='*',headers=['access-control-allow-origin','Content-Type'])
@@ -85,4 +88,5 @@ def checkStatus():
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port)
