@@ -59,43 +59,44 @@ def home():
 def getInterfaces():
     global interfaces
     interfaces = request.json["interfaces"]
-    # print("pipe interfaces")
-    # runAnotherFile()
-    # pipe = win32pipe.CreateNamedPipe(
-    #     r'\\.\pipe\Foo',
-    #     win32pipe.PIPE_ACCESS_DUPLEX,
-    #     win32pipe.PIPE_TYPE_MESSAGE | win32pipe.PIPE_READMODE_MESSAGE | win32pipe.PIPE_WAIT,
-    #     1, 65536, 65536,
-    #     0,
-    #     None)
-    # try:
-    #     print("waiting for client")
-    #     win32pipe.ConnectNamedPipe(pipe, None)
-    #     print("got client")
+    print("pipe interfaces")
+    runAnotherFile()
+    pipe = win32pipe.CreateNamedPipe(
+        r'\\.\pipe\Foo',
+        win32pipe.PIPE_ACCESS_DUPLEX,
+        win32pipe.PIPE_TYPE_MESSAGE | win32pipe.PIPE_READMODE_MESSAGE | win32pipe.PIPE_WAIT,
+        1, 65536, 65536,
+        0,
+        None)
+    try:
+        print("waiting for client")
+        win32pipe.ConnectNamedPipe(pipe, None)
+        print("got client")
 
-    #     win32file.WriteFile(pipe, str.encode(f"{interfaces}"))
-    #     time.sleep(2)
-    #     win32file.WriteFile(pipe, str.encode(f"{sendFilePath()}"))
-    #     abs.clear()
-    #     # print(sendFilePath())
-    #     print("finished now")
-    # finally:
-    #     win32file.CloseHandle(pipe)
-    # return interfaces
-
-    FIFO = './mypipe'
-    # os.mkfifo(FIFO)
-    # with open(FIFO) as fifo:
-    #     while True:
-    #         line = fifo.read()
-    # try:
-    
-    # except OSError as e:
-    #     print("faile :%s" % e)
-    # else:
-    #     fifo = open(FIFO, 'w')
-    print("path created")
+        win32file.WriteFile(pipe, str.encode(f"{interfaces}"))
+        time.sleep(2)
+        win32file.WriteFile(pipe, str.encode(f"{sendFilePath()}"))
+        abs.clear()
+        # print(sendFilePath())
+        print("finished now")
+    finally:
+        win32file.CloseHandle(pipe)
     return interfaces
+
+## <--- LINUX FILE UPLOAD FIFO --->
+    # FIFO = '\mypipe'
+    # os.mkfifo(FIFO)
+    # # with open(FIFO) as fifo:
+    # #     while True:
+    # #         line = fifo.read()
+    # # try:
+    
+    # # except OSError as e:
+    # #     print("faile :%s" % e)
+    # # else:
+    # #     fifo = open(FIFO, 'w')
+    # print("path created")
+    # return interfaces
         
 
 
