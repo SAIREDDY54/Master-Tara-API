@@ -15,6 +15,9 @@ import win32pipe
 import win32file
 import pywintypes
 import os, errno
+import mongoDB as db
+import change_stream as query
+import pymongo
 
 
 conn = pyodbc.connect(
@@ -24,6 +27,9 @@ cursor = conn.cursor()
 cursor.execute('select Field1 from Sheet3')
 
 db_list = []
+
+conn_url = "mongodb://localhost:27017/master_tara" # your connection string
+client = pymongo.MongoClient(conn_url)
 
 
 def fetch_data_from_db():
@@ -83,6 +89,23 @@ def fetch_data_from_db():
 #     for element in str_list:
 #         output_string += element
 #     return output_string
+
+def getData():
+    session_id = query.printSession()
+    print("seesion is", session_id)
+    if(client.master_tara.Interfaces.find_one_and_update({'sessionId': session_id}, {'$set': {"status":"processing"}})):
+        print("found")
+    else:
+        print("not found")
+    # for x in db.sampleTable.find({}, {"_id":0}):
+    #     print(x)
+    # if(db.sampleTable.find({'status':'processing'}, {"_id":0})):
+    #     db.sampleTable.update_one({'status':'processing'}, {"$set":{'status':'complete'}})
+    # else:
+    #     print('no DATA')
+    # return x
+    # return session_id
+    
 
 FIFO = "mypipe"
 
@@ -161,8 +184,9 @@ def main():
             new_list.append(i)
 
     # f_path =get_template_path()
-    print("Path returned by Front End is ", pipe_client())
-
+    # print("Path returned by Front End is ", pipe_client())
+    # print("data from db is ", getData())
+    getData()
     print("Value Fetched from the DB is :", new_list)
     print("Value Fetched from the DB Len is :", len(new_list))
 
