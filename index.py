@@ -124,7 +124,7 @@ def upload(file_name):
 #     return interfaces
 
 @app.route('/interfaces', methods=['POST'])
-# @cross_origin(origin='*',headers=['access-control-allow-origin','Content-Type'])
+@cross_origin()
 def getInterfaces():
     print(client)
     global interfaces
@@ -231,6 +231,7 @@ def getInput():
 #     return status
 
 @app.route('/checkStatus', methods=['GET'])
+@cross_origin()
 def checkStatus():
     getStatus()
     return status
