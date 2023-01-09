@@ -62,10 +62,7 @@ pycodestyle==2.9.1
 pycparser==2.21
 Pygments==2.13.0
 pymongo==4.3.3
-PyMySQL==1.0.2
-pyodbc==4.0.35
 pyparsing==3.0.9
-pypiwin32==223
 python-dateutil==2.8.2
 python-engineio==4.3.4
 python-socketio==5.7.2
