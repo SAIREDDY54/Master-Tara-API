@@ -1,10 +1,14 @@
-from flask import Flask, request
+from flask import Flask, jsonify, request, session
 import pymongo
 
 from flask_cors import CORS, cross_origin
+import win32pipe
+import win32file
 import time
+import os
 import threading
 # from mongotriggers import MongoTrigger
+from subprocess import Popen
 # import change_stream as cd
 from gridfs import GridFS
 import json
@@ -12,7 +16,7 @@ import json
 
 app = Flask(__name__)
 app.secret_key = "000d88cd9d90036ebdd237eb6b0db000"
-cors = CORS(app, resources={r'*': {'origins':'*'}})
+CORS(app)
 
 # conn_url = "mongodb://localhost:27017/" # your connection string
 
@@ -120,7 +124,7 @@ def upload(file_name):
 #     return interfaces
 
 @app.route('/interfaces', methods=['POST'])
-@cross_origin(origin=['https://tara-api.onrender.com'])
+# @cross_origin(origin=['https://flask-two.vercel.app'])
 def getInterfaces():
     print(client)
     global interfaces
@@ -227,7 +231,7 @@ def getInput():
 #     return status
 
 @app.route('/checkStatus', methods=['GET'])
-@cross_origin(origin=['https://tara-api.onrender.com'])
+# @cross_origin(origin=['https://flask-two.vercel.app'])
 def checkStatus():
     getStatus()
     return status
