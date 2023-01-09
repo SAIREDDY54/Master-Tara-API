@@ -1,14 +1,10 @@
-from flask import Flask, jsonify, request, session
+from flask import Flask, request
 import pymongo
 
 from flask_cors import CORS, cross_origin
-import win32pipe
-import win32file
 import time
-import os
 import threading
 # from mongotriggers import MongoTrigger
-from subprocess import Popen
 # import change_stream as cd
 from gridfs import GridFS
 import json
