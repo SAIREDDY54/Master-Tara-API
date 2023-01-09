@@ -120,7 +120,7 @@ def upload(file_name):
 #     return interfaces
 
 @app.route('/interfaces', methods=['POST'])
-@cross_origin(origin=['https://flask-two.vercel.app'])
+@cross_origin(origin=['https://tara-api.onrender.com/'])
 def getInterfaces():
     print(client)
     global interfaces
@@ -227,7 +227,7 @@ def getInput():
 #     return status
 
 @app.route('/checkStatus', methods=['GET'])
-@cross_origin(origin=['https://flask-two.vercel.app'])
+@cross_origin(origin=['https://tara-api.onrender.com/'])
 def checkStatus():
     getStatus()
     return status
