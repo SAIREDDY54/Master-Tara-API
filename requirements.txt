@@ -23,10 +23,6 @@ Flask==2.2.2
 Flask-Cors==3.0.10
 flask-crossdomain==0.1
 Flask-Session==0.4.0
-Flask-SocketIO==5.3.2
-fonttools==4.37.4
-gevent==22.10.2
-gevent-websocket==0.10.1
 greenlet==2.0.1
 gunicorn==20.1.0
 mongotriggers==2.0.1
