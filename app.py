@@ -14,9 +14,9 @@ app = Flask(__name__)
 app.secret_key = "000d88cd9d90036ebdd237eb6b0db000"
 # CORS(app)
 
-conn_url = "mongodb://localhost:27017/" # your connection string
+# conn_url = "mongodb://localhost:27017/" # your connection string
 
-# conn_url = "mongodb+srv://saikumar:saikumar@master-tara.2u3a4r1.mongodb.net/?retryWrites=true&w=majority"
+conn_url = "mongodb+srv://saikumar:saikumar@master-tara.2u3a4r1.mongodb.net/?retryWrites=true&w=majority"
 client = pymongo.MongoClient(conn_url)
 
 # triggers = MongoTrigger(client)
