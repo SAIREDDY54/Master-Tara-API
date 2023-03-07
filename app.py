@@ -1,64 +1,48 @@
-from flask import Flask, jsonify, request, session
+from flask import Flask, jsonify, request
 import pymongo
 
-from flask_cors import CORS, cross_origin
+from flask_cors import CORS
 import time
-import os
 import threading
-# from mongotriggers import MongoTrigger
-# import change_stream as cd
-from gridfs import GridFS
-import json
-
+import bcrypt
 
 app = Flask(__name__)
 app.secret_key = "000d88cd9d90036ebdd237eb6b0db000"
 CORS(app)
 
-# conn_url = "mongodb://localhost:27017/" # your connection string
+conn_url = "mongodb://localhost:27017/"  # your connection string
 
-conn_url = "mongodb+srv://saikumar:saikumar@master-tara.2u3a4r1.mongodb.net/?retryWrites=true&w=majority"
+# conn_url = "mongodb+srv://saikumar:saikumar@master-tara.2u3a4r1.mongodb.net/?retryWrites=true&w=majority"
 client = pymongo.MongoClient(conn_url)
 
-# triggers = MongoTrigger(client)
-
-grid_fs = GridFS(client.master_tara)
-
-# print(client)
-# Database = client.get_database('master_tara')
-
-# sampleTable = Database.Interfaces
-# print(client.changestream.sampleTable.insert_one)
-
-# app.config['CORS_HEADERS'] = 'Content-Type', 'access-control-allow-origin'
-
 interfaces = []
+awsCloud = []
+azureCloud = []
+DBAssets = []
 filePath = []
 absPath = []
 abs = []
+
+db_password = ""
 userSession = ""
 status = " "
 
-def notify(op_document):
-    print('added data to database')
 
 def updateStatus():
-    # Popen('python db_access.py')
-    # triggers.register_update_trigger(notify, 'master_tara', 'Interfaces')
-    # triggers.tail_oplog()
-    updateQuery = client.master_tara.Interfaces.find_one_and_update({'sessionId': userSession}, {'$set': {"status":"processing"}})
+    updateQuery = client.master_tara.Interfaces.find_one_and_update(
+        {'sessionId': userSession}, {'$set': {"status": "processing"}})
     time.sleep(5)
-    updateQuery = client.master_tara.Interfaces.find_one_and_update({'sessionId': userSession}, {'$set': {"status":"Completed"}})
+    updateQuery = client.master_tara.Interfaces.find_one_and_update(
+        {'sessionId': userSession}, {'$set': {"status": "Completed"}})
     # triggers.stop_tail()
-    
 
 
 def getStatus():
-    
+
     # print("status is", cd.printSession())
     change_stream = client.master_tara.Interfaces.watch([{
-    '$match': {
-        'operationType': { '$in': ['update'] }
+        '$match': {
+            'operationType': {'$in': ['update']}
         }
     }])
 
@@ -66,146 +50,115 @@ def getStatus():
         global status
         # print(change['updateDescription']['updatedFields']['status'])
         status = change['updateDescription']['updatedFields']['status']
-        
-        print("Called from interfaces",status)
+
+        print("Called from interfaces", status)
         # break
         time.sleep(1)
         break
     return status
-    # return status
-    
+
+# @app.route('/upload', methods=['PUT'])
+# def upload(file_name):
+#     with grid_fs.new_file(filename = file_name) as fp:
+#         fp.write(request.data)
+#         file_id = fp._id
+
+#     if grid_fs.find_one(file_id) is not None:
+#         return json.dumps({'state': 'File Saved successfully'}), 200
+#     else:
+#         return json.dumps({'state': 'Error while saving'}), 500
 
 
-@app.route('/hello', methods=['GET'])
-def home():
-    return "Hello World"
-
-@app.route('/upload', methods=['PUT'])
-def upload(file_name):
-    with grid_fs.new_file(filename = file_name) as fp:
-        fp.write(request.data)
-        file_id = fp._id
-    
-    if grid_fs.find_one(file_id) is not None:
-        return json.dumps({'state': 'File Saved successfully'}), 200
-    else:
-        return json.dumps({'state': 'Error while saving'}), 500
-
-# @app.route('/interfaces', methods=['POST'])
-# # @cross_origin(origin='*',headers=['access-control-allow-origin','Content-Type'])
-# def getInterfaces():
-#     global interfaces
-#     interfaces = request.json["interfaces"]
-#     print("pipe interfaces")
-#     runAnotherFile()
-#     pipe = win32pipe.CreateNamedPipe(
-#         r'\\.\pipe\Foo',
-#         win32pipe.PIPE_ACCESS_DUPLEX,
-#         win32pipe.PIPE_TYPE_MESSAGE | win32pipe.PIPE_READMODE_MESSAGE | win32pipe.PIPE_WAIT,
-#         1, 65536, 65536,
-#         0,
-#         None)
-#     try:
-#         print("waiting for client")
-#         win32pipe.ConnectNamedPipe(pipe, None)
-#         print("got client")
-
-#         win32file.WriteFile(pipe, str.encode(f"{interfaces}"))
-#         time.sleep(2)
-#         win32file.WriteFile(pipe, str.encode(f"{sendFilePath()}"))
-#         abs.clear()
-#         # print(sendFilePath())
-#         print("finished now")
-#     finally:
-#         win32file.CloseHandle(pipe)
-#     return interfaces
-
-@app.route('/interfaces', methods=['POST'])
+@app.route('/addData', methods=['POST'])
 # @cross_origin(origin=['https://flask-two.vercel.app'])
 def getInterfaces():
-    print(client)
     global interfaces
     global userSession
+    global awsCloud
+    global azureCloud
+    global DBAssets
+
     interfaces = request.json["interfaces"]
+    awsAssets = request.json["awsAssets"]
+    azureAssets = request.json["azureAssets"]
+    DBAssets = request.json["DBAssets"]
     userSession = request.json["sessionId"]
-    # ls = json.loads(interfaces)
-    # print(ls[0])
+    email = request.json["email"]
 
     queryObject = {
-        'interfaces': interfaces,
+        'interfaces': interfaces if len(interfaces) > 0 else "",
+        'awsAssets': awsAssets if len(awsAssets) > 0 else "",
+        'azureAssets': azureAssets if len(azureAssets) > 0 else "",
+        'DBAssets': DBAssets if len(DBAssets) > 0 else "",
         'sessionId': userSession,
         'status': "NEW"
     }
-    # print("from global", getStatus())
     thread = threading.Thread(target=getStatus)
     thread.daemon = True
     thread.start()
-    # print(client.master_tara.sampleTable.insert_one(queryObject).inserted_id)
     query = client.master_tara.Interfaces.insert_one(queryObject)
-    
+
     updateStatus()
-    
-    
-    # change_streams.close()
-    print("pipe interfaces")
-    
-    
-    
-    # getStatus()
-    
 
-    # pipe = win32pipe.CreateNamedPipe(
-    #     r'\\.\pipe\Foo',    
-    #     win32pipe.PIPE_ACCESS_DUPLEX,
-    #     win32pipe.PIPE_TYPE_MESSAGE | win32pipe.PIPE_READMODE_MESSAGE | win32pipe.PIPE_WAIT,
-    #     1, 65536, 65536,
-    #     0,
-    #     None)
-    # try:
-    #     print("waiting for client")
-    #     win32pipe.ConnectNamedPipe(pipe, None)
-    #     print("got client")
-
-    #     win32file.WriteFile(pipe, str.encode(f"{interfaces}"))
-    #     abs.clear()
-    #     # print(sendFilePath())
-    #     print("finished now")
-    # finally:
-    #     win32file.CloseHandle(pipe)
     return interfaces
 
 
+def hash_password(password):
+    password_bytes = password.encode('utf-8')
+    hashed_password = bcrypt.hashpw(password_bytes, bcrypt.gensalt())
+    return hashed_password.decode('utf-8')
 
-## <--- LINUX FILE UPLOAD FIFO --->
+
+@app.route('/registerUser', methods=['POST'])
+def uploadUserData():
+    mail = request.json['mail']
+    password = request.json['password']
+    pass_hash = hash_password(password)
+
+    if client.master_tara.UserData.find_one({"email": mail}):
+        return jsonify({'error': 'Email already exists'}), 400
+    else:
+        query = {
+            'email': mail,
+            'password': pass_hash
+        }
+
+        client.master_tara.UserData.insert_one(query)
+
+        return jsonify({"message": "Data has been successfully uploaded"}), 201
+
+
+@app.route('/loginUser', methods=['POST'])
+def loginUser():
+    email = request.json['mail']
+    password = request.json['password'].encode('utf-8')
+
+    user = client.master_tara.UserData.find_one({'email': email})
+
+    if user is None:
+        return jsonify({"message": "Email not found"}), 404
+    else:
+        db_password = user.get('password')
+        
+        if bcrypt.hashpw(password, db_password.encode('utf-8')) == db_password.encode('utf-8'):
+            return jsonify({"message": "Login successful"}), 200
+        else:
+            return jsonify({"message": "Incorrect password"}), 401
+
+# <--- LINUX FILE UPLOAD FIFO --->
     # FIFO = '\mypipe'
     # os.mkfifo(FIFO)
     # # with open(FIFO) as fifo:
     # #     while True:
     # #         line = fifo.read()
     # # try:
-    
+
     # # except OSError as e:
     # #     print("faile :%s" % e)
     # # else:
     # #     fifo = open(FIFO, 'w')
     # print("path created")
     # return interfaces
-        
-
-
-# @app.route('/filePath', methods=['POST'])
-# # @cross_origin(origin='*',headers=['access-control-allow-origin','Content-Type'])
-# def getFilePath():
-#     global filePath
-#     global abs
-#     filePath = request.json["filePath"]
-#     abs.append(os.path.abspath(filePath))
-#     return os.path.abspath(filePath)
-
-
-# def sendFilePath():
-
-#     return abs
 
 
 def getInput():
@@ -214,40 +167,12 @@ def getInput():
     else:
         return "NO"
 
-# def getStatus():
-#     change_stream = client.master_tara.Interfaces.watch([{
-#     '$match': {
-#         'operationType': { '$in': ['update'] }
-#         }
-#     }])
-
-#     for change in change_stream:
-#         # print(change['updateDescription']['updatedFields']['status'])
-#         status = change['updateDescription']['updatedFields']['status']
-#         print(status)
-#     return status
 
 @app.route('/checkStatus', methods=['GET'])
 # @cross_origin(origin=['https://flask-two.vercel.app'])
 def checkStatus():
     getStatus()
     return status
-# # @cross_origin(origin='*',headers=['access-control-allow-origin','Content-Type'])
-# def checkStatus():
-#     # change_stream = client.master_tara.Interfaces.watch([{
-#     # '$match': {
-#     #     'operationType': { '$in': ['update'] }
-#     #     }
-#     # }])
-
-#     # for change in change_stream:
-#     #     # print(change['updateDescription']['updatedFields']['status'])
-#     #     global status
-#     #     status = change['updateDescription']['updatedFields']['status']
-#     if getStatus() == "processing":
-#         return "YES"
-#     else:
-#         return "FALSE"
 
 
 if __name__ == '__main__':
